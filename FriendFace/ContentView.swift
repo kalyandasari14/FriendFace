@@ -4,12 +4,15 @@
 //
 //  Created by kalyan on 2/22/26.
 //
-
+import SwiftData
 import SwiftUI
 
+
+
 struct ContentView: View {
-    
-    @State private var users = [User]()
+    @Environment(\.modelContext) var modelContext
+    @Query(sort: \User.name) var users: [User]
+   
     var body: some View {
         NavigationStack{
             List(users){user in
@@ -44,7 +47,11 @@ struct ContentView: View {
             
             decoder.dateDecodingStrategy = .iso8601
             
-            users = try decoder.decode([User].self, from: data)
+           let downloadedusers = try decoder.decode([User].self, from: data)
+            
+            for user in downloadedusers {
+                modelContext.insert(user)
+            }
         } catch {
             print("Download failed")
         }
